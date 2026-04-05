@@ -6,11 +6,7 @@ import {
   useSensors,
   type DragEndEvent,
 } from '@dnd-kit/core';
-import {
-  SortableContext,
-  arrayMove,
-  rectSortingStrategy,
-} from '@dnd-kit/sortable';
+import { SortableContext, arrayMove, rectSortingStrategy } from '@dnd-kit/sortable';
 import type { PdfItem } from '../types/pdf';
 import FileListItem from './FileListItem';
 
@@ -49,26 +45,39 @@ function FileList({ items, disabled, onRemove, onReorder }: FileListProps) {
 
   if (items.length === 0) {
     return (
-      <section className="file-panel empty-state">
-        <h3>No PDFs added yet</h3>
-        <p>Once you add files, you can sort them, remove them, and merge them into one document.</p>
+      <section className="rounded-[2rem] border border-dashed border-slate-300 bg-white/70 p-10 text-center shadow-[0_30px_90px_-55px_rgba(15,23,42,0.4)] backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/60">
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">
+          Empty queue
+        </p>
+        <h3 className="mt-4 text-2xl font-semibold tracking-tight text-slate-950 dark:text-white">
+          Add PDFs to start the merge pipeline.
+        </h3>
+        <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-500 dark:text-slate-400">
+          New uploads are sorted alphabetically first. After that, you can drag files into any custom order before merging.
+        </p>
       </section>
     );
   }
 
   return (
-    <section className="file-panel">
-      <div className="file-panel-header">
+    <section className="rounded-[2rem] border border-white/60 bg-white/75 p-5 shadow-[0_40px_120px_-55px_rgba(15,23,42,0.45)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/65">
+      <div className="flex flex-col gap-3 border-b border-slate-200/80 pb-5 dark:border-slate-800 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h3>Merge queue</h3>
-          <p>Drag files to set the page order in the final merged document.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-500 dark:text-cyan-300">
+            Merge queue
+          </p>
+          <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 dark:text-white">
+            Drag cards to define the final page sequence.
+          </h3>
         </div>
-        <span className="file-count">{items.length} file(s)</span>
+        <div className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white dark:bg-white dark:text-slate-900">
+          {items.length} file(s)
+        </div>
       </div>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={items} strategy={rectSortingStrategy}>
-          <ul className="file-list">
+          <ul className="mt-5 grid gap-4">
             {items.map((item, index) => (
               <FileListItem
                 key={item.id}

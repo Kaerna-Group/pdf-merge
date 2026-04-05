@@ -14,3 +14,12 @@ export function formatFileSize(bytes: number): string {
 
   return `${size.toFixed(size >= 100 ? 0 : 1)} ${units[unitIndex]}`;
 }
+
+export function sortByLabel<T extends { name: string }>(items: T[]): T[] {
+  return [...items].sort((left, right) =>
+    left.name.localeCompare(right.name, undefined, {
+      numeric: true,
+      sensitivity: 'base',
+    }),
+  );
+}

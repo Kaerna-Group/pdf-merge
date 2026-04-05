@@ -1,12 +1,19 @@
 import {
   DndContext,
+  DragOverlay,
   PointerSensor,
   closestCenter,
   useSensor,
   useSensors,
   type DragEndEvent,
+  type DragStartEvent,
 } from '@dnd-kit/core';
-import { SortableContext, arrayMove, rectSortingStrategy } from '@dnd-kit/sortable';
+import {
+  SortableContext,
+  arrayMove,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { useMemo, useState } from 'react';
 import type { PdfItem } from '../types/pdf';
 import FileListItem from './FileListItem';
 
@@ -18,16 +25,27 @@ interface FileListProps {
 }
 
 function FileList({ items, disabled, onRemove, onReorder }: FileListProps) {
+  const [activeId, setActiveId] = useState<string | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 6,
+        distance: 8,
       },
     }),
   );
 
+  const activeItem = useMemo(
+    () => items.find((item) => item.id === activeId) ?? null,
+    [activeId, items],
+  );
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(String(event.active.id));
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    setActiveId(null);
 
     if (!over || active.id === over.id) {
       return;
@@ -41,6 +59,10 @@ function FileList({ items, disabled, onRemove, onReorder }: FileListProps) {
     }
 
     onReorder(arrayMove(items, oldIndex, newIndex));
+  };
+
+  const handleDragCancel = () => {
+    setActiveId(null);
   };
 
   if (items.length === 0) {
@@ -75,8 +97,14 @@ function FileList({ items, disabled, onRemove, onReorder }: FileListProps) {
         </div>
       </div>
 
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={items} strategy={rectSortingStrategy}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+      >
+        <SortableContext items={items} strategy={verticalListSortingStrategy}>
           <ul className="mt-5 grid gap-4">
             {items.map((item, index) => (
               <FileListItem
@@ -89,6 +117,20 @@ function FileList({ items, disabled, onRemove, onReorder }: FileListProps) {
             ))}
           </ul>
         </SortableContext>
+
+        <DragOverlay adjustScale={false} dropAnimation={null}>
+          {activeItem ? (
+            <div className="rotate-[0.35deg]">
+              <FileListItem
+                item={activeItem}
+                index={items.findIndex((item) => item.id === activeItem.id)}
+                disabled
+                onRemove={onRemove}
+                isOverlay
+              />
+            </div>
+          ) : null}
+        </DragOverlay>
       </DndContext>
     </section>
   );

@@ -11,7 +11,8 @@ Browser-only PDF merger built with React, Vite, TypeScript, Tailwind CSS, and `p
 - Remove files from the queue
 - Merge PDFs entirely in the browser
 - Download the final `merged.pdf`
-- Progress indicator, theme toggle, and friendly error handling
+- Popup settings modal with `light`, `dark`, and `system` theme profiles
+- Theme preference persisted in `localStorage`
 - Ready for Vercel, Netlify, and GitHub Pages
 
 ## Project Structure
@@ -32,6 +33,8 @@ pdf-merge/
 ¦  ¦  +- FileListItem.tsx
 ¦  ¦  +- HeroSection.tsx
 ¦  ¦  +- ProgressBar.tsx
+¦  ¦  +- SettingsButton.tsx
+¦  ¦  +- SettingsModal.tsx
 ¦  ¦  L- ThemeToggle.tsx
 ¦  +- hooks/
 ¦  ¦  +- usePdfMerge.ts
@@ -73,25 +76,7 @@ npm run build
 npm run preview
 ```
 
-The production-ready static files will be generated in `dist/`.
-
 ## Deployment
-
-### Vercel
-
-1. Import the repository into Vercel.
-2. Keep the framework preset as `Vite`.
-3. Use:
-   - Build command: `npm run build`
-   - Output directory: `dist`
-
-### Netlify
-
-1. Import the repository into Netlify.
-2. Use:
-   - Build command: `npm run build`
-   - Publish directory: `dist`
-3. The included `netlify.toml` is already configured for SPA routing.
 
 ### GitHub Pages
 
@@ -108,14 +93,6 @@ The workflow configures the correct base path for Pages, builds the app, and dep
 
 - `App.tsx` composes the page from high-level components only.
 - `hooks/usePdfMerge.ts` owns queue state, merge actions, progress, errors, and download URL lifecycle.
-- `hooks/useTheme.ts` owns theme persistence and DOM theme synchronization.
-- `components/` contains page sections and focused UI building blocks for upload, sorting, actions, progress, theme toggle, and layout shell.
+- `hooks/useTheme.ts` owns theme preference persistence and DOM theme synchronization.
+- `components/SettingsModal.tsx` provides the popup settings surface for choosing a theme profile.
 - `services/mergePdfs.ts` encapsulates the PDF merging workflow with `pdf-lib`.
-- `utils/` contains file validation and formatting helpers.
-- `types/` stores shared application types for clean component contracts.
-
-## Notes
-
-- All PDF processing happens locally in the browser.
-- No files are uploaded to any server.
-- The generated file name is fixed to `merged.pdf`.

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import ActionBar from './components/ActionBar';
 import AppBackground from './components/AppBackground';
 import ErrorBanner from './components/ErrorBanner';
@@ -5,11 +6,13 @@ import FileDropzone from './components/FileDropzone';
 import FileList from './components/FileList';
 import HeroSection from './components/HeroSection';
 import ProgressBar from './components/ProgressBar';
+import SettingsModal from './components/SettingsModal';
 import { usePdfMerge } from './hooks/usePdfMerge';
 import { useTheme } from './hooks/useTheme';
 
 function App() {
-  const { theme, toggleTheme } = useTheme();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const { themePreference, setThemePreference } = useTheme();
   const {
     files,
     status,
@@ -32,8 +35,8 @@ function App() {
         <HeroSection
           filesCount={files.length}
           status={status}
-          theme={theme}
-          onToggleTheme={toggleTheme}
+          themePreference={themePreference}
+          onOpenSettings={() => setIsSettingsOpen(true)}
         />
 
         <FileDropzone disabled={status === 'merging'} onFilesSelected={handleFilesSelected} />
@@ -60,6 +63,13 @@ function App() {
           onReorder={handleReorder}
         />
       </main>
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        themePreference={themePreference}
+        onClose={() => setIsSettingsOpen(false)}
+        onThemeChange={setThemePreference}
+      />
     </AppBackground>
   );
 }
